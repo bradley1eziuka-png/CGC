@@ -780,6 +780,107 @@
     /* Ensure all page sections float above the fixed falling pattern */
     nav, section, footer { position: relative; z-index: 1; }
     nav { z-index: 100; }
+
+    /* ─── FORM ENHANCEMENTS ──────────────────────────────── */
+    .field-error {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.78rem; letter-spacing: 0.06em;
+      color: #ff4560; margin-top: 8px;
+    }
+
+    .hydro-note {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-family: 'Barlow', sans-serif; font-size: 0.84rem; line-height: 1.55;
+      color: var(--cyan);
+      background: rgba(0,229,255,0.06);
+      border: 1px solid rgba(0,229,255,0.22);
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+
+    .toggle-opt.disabled label {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .color-section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 0.64rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+      gap: 8px;
+    }
+
+    .color-opt { position: relative; cursor: pointer; }
+    .color-opt input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    .color-opt-inner {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 10px 6px 12px;
+      border: 1.5px solid rgba(0,229,255,0.12);
+      background: var(--elevated);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .color-opt:hover .color-opt-inner {
+      border-color: rgba(0,229,255,0.38);
+      transform: translateY(-2px);
+    }
+
+    .color-opt:has(input:checked) .color-opt-inner {
+      border-color: var(--cyan);
+      box-shadow: 0 0 18px rgba(0,229,255,0.18), 0 0 0 1px rgba(0,229,255,0.12);
+    }
+
+    .color-img-wrap {
+      width: 56px; height: 84px;
+      overflow: hidden; border-radius: 3px;
+      position: relative;
+    }
+
+    .color-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+    }
+
+    .color-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem; letter-spacing: 0.04em;
+      color: var(--muted); text-align: center; line-height: 1.3;
+      transition: color 0.2s;
+    }
+
+    .color-opt:has(input:checked) .color-name { color: var(--cyan); }
+
+    .color-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-hi), transparent);
+      margin: 20px 0;
+    }
+
+    .check-item.linked {
+      border-color: rgba(0,229,255,0.3);
+      background: rgba(0,229,255,0.04);
+    }
+
+    .linked-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--cyan); background: rgba(0,229,255,0.12);
+      border: 1px solid rgba(0,229,255,0.25);
+      padding: 1px 6px; margin-left: 4px;
+      vertical-align: middle; white-space: nowrap;
+    }
+
+    #customization-block {
+      transition: opacity 0.35s ease;
+    }
   </style>
 </head>
 
@@ -823,8 +924,8 @@
           Built Your Way.
         </h1>
         <p class="hero-desc">
-          PS5. Xbox. Nintendo Switch. Every controller and console is built to order: spray paint,
-          hydro dip, or a mix of both. No templates. No limits.
+          PS5. Xbox. Nintendo Switch. Every build is made to order: spray paint, hydro dip, or
+          a mix of both. Your vision, built from scratch.
         </p>
         <a href="#order" class="btn-cta">
           Start Your Order
@@ -986,7 +1087,7 @@
         <div class="form-card reveal">
           <form id="orderForm" novalidate>
 
-            <!-- System -->
+            <!-- 1. System -->
             <div class="form-row">
               <label class="form-label" for="system">System</label>
               <select class="form-input" id="system" name="system" required>
@@ -998,93 +1099,102 @@
               </select>
             </div>
 
-            <!-- Parts -->
-            <div class="form-row">
-              <label class="form-label">Parts to Customize</label>
-              <div class="parts-grid">
-                <label class="check-item">
-                  <input type="checkbox" name="parts" value="top-shell">
-                  <span class="check-box"></span>
-                  <span class="check-label">Top Shell</span>
-                </label>
-                <label class="check-item">
-                  <input type="checkbox" name="parts" value="back-plate">
-                  <span class="check-box"></span>
-                  <span class="check-label">Back Plate</span>
-                </label>
-                <label class="check-item">
-                  <input type="checkbox" name="parts" value="buttons">
-                  <span class="check-box"></span>
-                  <span class="check-label">Buttons</span>
-                </label>
-                <label class="check-item">
-                  <input type="checkbox" name="parts" value="ps-button">
-                  <span class="check-box"></span>
-                  <span class="check-label">PlayStation Button</span>
-                </label>
-                <label class="check-item" style="grid-column: 1 / -1;">
-                  <input type="checkbox" name="parts" value="console">
-                  <span class="check-box"></span>
-                  <span class="check-label">Console (Full Build)</span>
-                </label>
+            <!-- Customization block — revealed when system is selected -->
+            <div id="customization-block" style="display:none; opacity:0;">
+
+              <!-- 2. Parts -->
+              <div class="form-row">
+                <label class="form-label">Parts to Customize</label>
+                <div class="parts-grid" id="parts-grid"></div>
+                <p class="field-error" id="parts-error" style="display:none">Select at least one part to continue.</p>
               </div>
-            </div>
 
-            <!-- Color -->
-            <div class="form-row">
-              <label class="form-label" for="color">Color Preference</label>
-              <input
-                type="text" class="form-input" id="color" name="color"
-                placeholder="e.g. Matte black, blood red, ocean blue gradient…"
-              >
-            </div>
-
-            <!-- Hydro dip toggle -->
-            <div class="form-row">
-              <label class="form-label">Hydro Dip Finish?</label>
-              <div class="toggle-group">
-                <div class="toggle-opt">
-                  <input type="radio" name="hydrodip" value="yes" id="hydro-yes">
-                  <label for="hydro-yes">Yes</label>
+              <!-- 3. Hydro Dip Toggle -->
+              <div class="form-row" id="hydro-row">
+                <label class="form-label">Hydro Dip?</label>
+                <div class="hydro-note">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Hydro dipping applies to Top Shell and Touchpad (PS5) only
                 </div>
-                <div class="toggle-opt">
-                  <input type="radio" name="hydrodip" value="no" id="hydro-no" checked>
-                  <label for="hydro-no">No</label>
+                <div class="toggle-group">
+                  <div class="toggle-opt">
+                    <input type="radio" name="hydrodip" value="yes" id="hydro-yes">
+                    <label for="hydro-yes">Yes</label>
+                  </div>
+                  <div class="toggle-opt">
+                    <input type="radio" name="hydrodip" value="no" id="hydro-no" checked>
+                    <label for="hydro-no">No</label>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Name -->
+              <!-- Touchpad auto-link notice (PS5 only, shown when Hydro Dip + Top Shell) -->
+              <div class="form-row" id="touchpad-link-notice" style="display:none">
+                <div class="hydro-note" style="border-color:rgba(0,229,255,0.38)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  Touchpad will be hydro dipped in the same colors as the Top Shell — no separate color selection needed.
+                </div>
+              </div>
+
+              <!-- 4. Finish -->
+              <div class="form-row">
+                <label class="form-label">Finish</label>
+                <div class="toggle-group">
+                  <div class="toggle-opt" id="matte-finish-opt">
+                    <input type="radio" name="finish" value="matte" id="finish-matte">
+                    <label for="finish-matte">Matte</label>
+                  </div>
+                  <div class="toggle-opt">
+                    <input type="radio" name="finish" value="gloss" id="finish-gloss">
+                    <label for="finish-gloss">Gloss</label>
+                  </div>
+                </div>
+                <p class="field-error" id="finish-error" style="display:none">Please select a finish type.</p>
+              </div>
+
+              <!-- 5. Color Selection -->
+              <div class="form-row">
+                <label class="form-label" style="margin-bottom:16px">Color</label>
+
+                <!-- Matte Colors -->
+                <div id="matte-colors-block">
+                  <p class="color-section-label">Matte Colors</p>
+                  <div class="color-grid" id="matte-color-grid"></div>
+                </div>
+
+                <div class="color-divider" id="color-divider"></div>
+
+                <!-- Gloss Colors -->
+                <div id="gloss-colors-block">
+                  <p class="color-section-label">Gloss Colors</p>
+                  <div class="color-grid" id="gloss-color-grid"></div>
+                </div>
+
+                <p class="field-error" id="color-error" style="display:none">Please select a color.</p>
+              </div>
+
+            </div>
+            <!-- end customization-block -->
+
+            <!-- 6. Name -->
             <div class="form-row">
               <label class="form-label" for="name">Your Name</label>
-              <input
-                type="text" class="form-input" id="name" name="name"
-                placeholder="First name is fine" required
-              >
+              <input type="text" class="form-input" id="name" name="name" placeholder="First name is fine" required>
             </div>
 
-            <!-- Contact -->
+            <!-- 7. Contact -->
             <div class="form-row">
               <label class="form-label" for="contact">Instagram Handle or Phone Number</label>
-              <input
-                type="text" class="form-input" id="contact" name="contact"
-                placeholder="@yourhandle  or  (555) 000-0000" required
-              >
+              <input type="text" class="form-input" id="contact" name="contact" placeholder="@yourhandle  or  (555) 000-0000" required>
             </div>
 
-            <!-- Notes -->
+            <!-- 8. Notes -->
             <div class="form-row" style="margin-bottom: 36px;">
               <label class="form-label" for="notes">Additional Notes</label>
-              <textarea
-                class="form-input" id="notes" name="notes" rows="4"
-                style="resize: vertical;"
-                placeholder="Reference images, inspo, specific details…"
-              ></textarea>
+              <textarea class="form-input" id="notes" name="notes" rows="4" style="resize: vertical;" placeholder="Reference images, inspo, specific details…"></textarea>
             </div>
 
-            <button type="submit" class="btn-submit" id="submitBtn">
-              Submit Order Request
-            </button>
+            <button type="submit" class="btn-submit" id="submitBtn">Submit Order Request</button>
 
             <div class="form-success" id="formSuccess">
               ✓ &nbsp;Order request sent! We'll reach out soon.
@@ -1128,56 +1238,274 @@
 
 
   <script>
-    /* ── Nav links show on wider screens ── */
+    /* ── PARTS BY SYSTEM ─────────────────────────────────────── */
+    const PARTS_BY_SYSTEM = {
+      'ps5-controller': [
+        { value: 'top-shell',  label: 'Top Shell',       hydroEligible: true },
+        { value: 'back-plate', label: 'Back Plate' },
+        { value: 'buttons',    label: 'Buttons' },
+        { value: 'd-pad',      label: 'D-Pad' },
+        { value: 'l1',         label: 'L1' },
+        { value: 'l2',         label: 'L2' },
+        { value: 'r1',         label: 'R1' },
+        { value: 'r2',         label: 'R2' },
+        { value: 'touchpad',   label: 'Touchpad',        hydroLinked: true },
+      ],
+      'xbox': [
+        { value: 'top-shell',       label: 'Top Shell',       hydroEligible: true },
+        { value: 'back-plate',      label: 'Back Plate' },
+        { value: 'buttons',         label: 'Buttons' },
+        { value: 'd-pad',           label: 'D-Pad' },
+        { value: 'lt',              label: 'LT' },
+        { value: 'rt',              label: 'RT' },
+        { value: 'lb',              label: 'LB' },
+        { value: 'rb',              label: 'RB' },
+        { value: 'trigger-buttons', label: 'Trigger Buttons' },
+      ],
+      'switch': [
+        { value: 'top-shell',       label: 'Top Shell',       hydroEligible: true },
+        { value: 'back-plate',      label: 'Back Plate' },
+        { value: 'buttons',         label: 'Buttons' },
+        { value: 'd-pad',           label: 'D-Pad' },
+        { value: 'zl',              label: 'ZL' },
+        { value: 'zr',              label: 'ZR' },
+        { value: 'l',               label: 'L' },
+        { value: 'r',               label: 'R' },
+        { value: 'trigger-buttons', label: 'Trigger Buttons' },
+      ],
+      'ps5-console': [
+        { value: 'panels', label: 'Panels' },
+      ],
+    };
+
+    /* ── COLOR CATALOG ───────────────────────────────────────────
+       To add a new color: push a new entry to MATTE_COLORS or
+       GLOSS_COLORS. Set img to a file path when the spray can
+       image is ready; while img is null a colored placeholder shows.
+    ─────────────────────────────────────────────────────────── */
+    const MATTE_COLORS = [
+      { id: 'matte-black', name: 'Matte Black', img: null, hex: '1a1a1a' },
+      { id: 'matte-white', name: 'Matte White', img: null, hex: 'd0d0d0' },
+      { id: 'matte-red',   name: 'Matte Red',   img: null, hex: '7a0000' },
+      { id: 'matte-blue',  name: 'Matte Blue',  img: null, hex: '0a2a6e' },
+      { id: 'matte-green', name: 'Matte Green', img: null, hex: '0a3a0a' },
+      { id: 'matte-grey',  name: 'Matte Grey',  img: null, hex: '444444' },
+    ];
+
+    const GLOSS_COLORS = [
+      { id: 'gloss-black',  name: 'Gloss Black',  img: null, hex: '0d0d0d' },
+      { id: 'gloss-white',  name: 'Gloss White',  img: null, hex: 'f0f0f0' },
+      { id: 'gloss-red-pepper', name: 'Gloss Red Pepper', img: 'Brand%20Images/Red%20Can.png', hex: 'cc0000' },
+      { id: 'gloss-blue',   name: 'Gloss Blue',   img: null, hex: '0044cc' },
+      { id: 'gloss-gold',   name: 'Gloss Gold',   img: null, hex: 'b8860b' },
+      { id: 'gloss-silver', name: 'Gloss Silver', img: null, hex: '9a9a9a' },
+    ];
+
+    /* ── HELPERS ─────────────────────────────────────────────── */
+    function buildColorGrid(colors, finish) {
+      return colors.map(c => {
+        const src = c.img
+          ? c.img
+          : `https://placehold.co/56x84/${c.hex}/ffffff?text=+`;
+        return `
+          <label class="color-opt">
+            <input type="radio" name="color" value="${c.id}" data-finish="${finish}">
+            <span class="color-opt-inner">
+              <span class="color-img-wrap"><img src="${src}" alt="${c.name}"></span>
+              <span class="color-name">${c.name}</span>
+            </span>
+          </label>`;
+      }).join('');
+    }
+
+    function buildPartsGrid(system) {
+      const parts = PARTS_BY_SYSTEM[system] || [];
+      return parts.map(p => `
+        <label class="check-item" data-part="${p.value}"${p.hydroLinked ? ' data-hydro-linked="true"' : ''}>
+          <input type="checkbox" name="parts" value="${p.value}"${p.hydroLinked ? ' id="touchpad-check"' : ''}>
+          <span class="check-box"></span>
+          <span class="check-label">${p.label}</span>
+        </label>`
+      ).join('');
+    }
+
+    /* ── DOM REFS ────────────────────────────────────────────── */
+    const systemEl        = document.getElementById('system');
+    const custBlock       = document.getElementById('customization-block');
+    const partsGrid       = document.getElementById('parts-grid');
+    const partsError      = document.getElementById('parts-error');
+    const hydroRow        = document.getElementById('hydro-row');
+    const hydroYes        = document.getElementById('hydro-yes');
+    const hydroNo         = document.getElementById('hydro-no');
+    const touchNotice     = document.getElementById('touchpad-link-notice');
+    const matteFinishOpt  = document.getElementById('matte-finish-opt');
+    const finishGloss     = document.getElementById('finish-gloss');
+    const finishMatte     = document.getElementById('finish-matte');
+    const finishError     = document.getElementById('finish-error');
+    const matteColorsBlock = document.getElementById('matte-colors-block');
+    const colorDivider    = document.getElementById('color-divider');
+    const colorError      = document.getElementById('color-error');
+
+    /* ── INIT color grids (rendered once) ───────────────────── */
+    document.getElementById('matte-color-grid').innerHTML = buildColorGrid(MATTE_COLORS, 'matte');
+    document.getElementById('gloss-color-grid').innerHTML = buildColorGrid(GLOSS_COLORS, 'gloss');
+
+    /* ── SYSTEM CHANGE ───────────────────────────────────────── */
+    systemEl.addEventListener('change', () => {
+      const sys = systemEl.value;
+
+      partsGrid.innerHTML = buildPartsGrid(sys);
+      partsGrid.querySelectorAll('input[type="checkbox"]').forEach(cb =>
+        cb.addEventListener('change', onPartsChange)
+      );
+
+      // Reset hydro to No
+      hydroNo.checked = true;
+
+      // Hydro row only relevant when system has a Top Shell (not PS5 Console)
+      hydroRow.style.display = (sys === 'ps5-console') ? 'none' : '';
+
+      // Show the customization block
+      custBlock.style.display = 'block';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        custBlock.style.opacity = '1';
+      }));
+
+      updateHydroState();
+    });
+
+    /* ── HYDRO DIP CHANGE ────────────────────────────────────── */
+    [hydroYes, hydroNo].forEach(r => r.addEventListener('change', updateHydroState));
+
+    function updateHydroState() {
+      const isHydro = hydroYes.checked;
+
+      // Disable Matte finish option
+      matteFinishOpt.classList.toggle('disabled', isHydro);
+      finishMatte.disabled = isHydro;
+      if (isHydro) {
+        finishGloss.checked = true;
+        finishMatte.checked = false;
+        // Deselect any matte color
+        document.querySelectorAll('input[name="color"][data-finish="matte"]')
+          .forEach(r => r.checked = false);
+      }
+
+      // Show/hide Matte colors section
+      matteColorsBlock.style.display = isHydro ? 'none' : '';
+      colorDivider.style.display     = isHydro ? 'none' : '';
+
+      updateTouchpadLink();
+    }
+
+    /* ── PARTS CHANGE ────────────────────────────────────────── */
+    function onPartsChange() {
+      updateTouchpadLink();
+    }
+
+    function updateTouchpadLink() {
+      const isHydro      = hydroYes.checked;
+      const topShellCb   = partsGrid.querySelector('input[value="top-shell"]');
+      const touchpadItem = partsGrid.querySelector('[data-part="touchpad"]');
+      const touchpadCb   = document.getElementById('touchpad-check');
+
+      if (!touchpadItem || !touchpadCb || !topShellCb) {
+        touchNotice.style.display = 'none';
+        return;
+      }
+
+      const shouldLink = isHydro && topShellCb.checked;
+
+      if (shouldLink) {
+        touchpadCb.checked  = true;
+        touchpadCb.disabled = true;
+        touchpadItem.classList.add('linked');
+        touchNotice.style.display = 'block';
+      } else {
+        touchpadCb.disabled = false;
+        touchpadItem.classList.remove('linked');
+        touchNotice.style.display = 'none';
+      }
+    }
+
+    /* ── NAV ─────────────────────────────────────────────────── */
     const mq = window.matchMedia('(min-width: 768px)');
     const navLinks = document.getElementById('nav-links');
     const updateNav = () => { navLinks.style.display = mq.matches ? 'flex' : 'none'; };
     mq.addEventListener('change', updateNav);
     updateNav();
 
-    /* ── Scroll reveal ── */
+    /* ── SCROLL REVEAL ───────────────────────────────────────── */
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('in');
-          io.unobserve(e.target);
-        }
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
       });
     }, { threshold: 0.1 });
-
     document.querySelectorAll('.reveal, .stagger').forEach(el => io.observe(el));
-
-    /* ── Hero fires immediately ── */
     setTimeout(() => document.getElementById('hero-copy')?.classList.add('in'), 120);
 
-    /* ── Form submit ── */
-    document.getElementById('orderForm').addEventListener('submit', function (e) {
+    /* ── FORM SUBMIT ─────────────────────────────────────────── */
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      let valid = true;
 
-      const btn = document.getElementById('submitBtn');
-      const success = document.getElementById('formSuccess');
-      const name = document.getElementById('name').value.trim();
-      const contact = document.getElementById('contact').value.trim();
-      const system = document.getElementById('system').value;
-
-      if (!system || !name || !contact) {
-        [document.getElementById('system'), document.getElementById('name'), document.getElementById('contact')]
-          .forEach(el => {
-            if (!el.value.trim()) {
-              el.style.borderColor = '#ff4560';
-              el.addEventListener('input', () => el.style.borderColor = '', { once: true });
-            }
-          });
-        return;
+      // System
+      if (!systemEl.value) {
+        systemEl.style.borderColor = '#ff4560';
+        systemEl.addEventListener('change', () => systemEl.style.borderColor = '', { once: true });
+        valid = false;
       }
 
+      // Customization fields (only when block is visible)
+      if (custBlock.style.display !== 'none') {
+        const checkedParts = partsGrid.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkedParts.length === 0) {
+          partsError.style.display = 'block';
+          valid = false;
+        } else {
+          partsError.style.display = 'none';
+        }
+
+        const finishVal = document.querySelector('input[name="finish"]:checked');
+        if (!finishVal) {
+          finishError.style.display = 'block';
+          valid = false;
+        } else {
+          finishError.style.display = 'none';
+        }
+
+        const colorVal = document.querySelector('input[name="color"]:checked');
+        if (!colorVal) {
+          colorError.style.display = 'block';
+          valid = false;
+        } else {
+          colorError.style.display = 'none';
+        }
+      }
+
+      // Name & Contact
+      ['name', 'contact'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) {
+          el.style.borderColor = '#ff4560';
+          el.addEventListener('input', () => el.style.borderColor = '', { once: true });
+          valid = false;
+        }
+      });
+
+      if (!valid) return;
+
+      const btn     = document.getElementById('submitBtn');
+      const success = document.getElementById('formSuccess');
       btn.textContent = 'Sending…';
-      btn.disabled = true;
+      btn.disabled    = true;
 
       setTimeout(() => {
         success.style.display = 'block';
         btn.textContent = 'Submitted!';
         this.reset();
+        custBlock.style.opacity = '0';
+        custBlock.style.display = 'none';
         success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }, 900);
     });
