@@ -878,8 +878,103 @@
       vertical-align: middle; white-space: nowrap;
     }
 
-    #customization-block {
-      transition: opacity 0.35s ease;
+    /* ─── WIZARD ─────────────────────────────────────── */
+    .wizard-progress-wrap {
+      margin-bottom: 24px;
+    }
+    .wizard-step-counter {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
+    }
+    .wizard-step-counter span { color: var(--cyan); }
+    .wizard-progress-bar {
+      height: 3px; background: var(--border); position: relative;
+    }
+    .wizard-progress-fill {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan-glow);
+      transition: width 0.4s ease;
+    }
+
+    .wizard-step { display: none; }
+    .wizard-step.active { display: block; }
+
+    .step-part-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700; font-size: 0.95rem; letter-spacing: 0.04em;
+      color: var(--text); margin-bottom: 16px;
+    }
+    .step-separator {
+      height: 1px;
+      background: linear-gradient(90deg, var(--border-hi), transparent);
+      margin-bottom: 24px;
+    }
+
+    .skip-wrap { margin-bottom: 20px; }
+    .skip-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px;
+      background: var(--elevated);
+      border: 1.5px solid rgba(0,229,255,0.18);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); cursor: pointer;
+      transition: all 0.2s; user-select: none;
+    }
+    .skip-btn:hover { border-color: rgba(0,229,255,0.4); color: var(--text); }
+    .skip-btn.active { border-color: var(--cyan); background: rgba(0,229,255,0.08); color: var(--cyan); }
+
+    .part-options-wrap { transition: opacity 0.25s; }
+    .part-options-wrap.dimmed { opacity: 0.22; pointer-events: none; user-select: none; }
+
+    .wizard-nav { display: flex; gap: 12px; margin-top: 28px; }
+
+    .btn-wiz-back {
+      flex: 0 0 auto;
+      background: transparent;
+      border: 1.5px solid rgba(0,229,255,0.2);
+      color: var(--muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 0.85rem; letter-spacing: 0.1em;
+      padding: 14px 22px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-wiz-back:hover { border-color: var(--cyan); color: var(--text); }
+    .btn-wiz-back:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+    .btn-wiz-next {
+      flex: 1;
+      background: var(--cyan); color: #0a0a0a;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 14px 24px; border: none; cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+    }
+    .btn-wiz-next:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(0,229,255,0.35); }
+    .btn-wiz-next:active { transform: translateY(0); }
+    .btn-wiz-next:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+    .hydro-color-hint {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 10px;
+    }
+
+    .color-opt-check { position: relative; cursor: pointer; }
+    .color-opt-check input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .color-opt-check:has(input:checked) .color-opt-inner {
+      border-color: var(--cyan);
+      box-shadow: 0 0 18px rgba(0,229,255,0.18), 0 0 0 1px rgba(0,229,255,0.12);
+    }
+    .color-opt-check:has(input:checked) .color-name { color: var(--cyan); }
+    .color-opt-check.maxed .color-opt-inner { opacity: 0.3; cursor: not-allowed; }
+
+    .color-grid-placeholder {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.82rem; letter-spacing: 0.06em;
+      color: var(--muted); grid-column: 1 / -1;
     }
   </style>
 </head>
@@ -1085,118 +1180,60 @@
         </div>
 
         <div class="form-card reveal">
+          <!-- Progress (hidden until system chosen) -->
+          <div id="wizard-progress" style="display:none" class="wizard-progress-wrap">
+            <div class="wizard-step-counter">Step <span id="wiz-step-num">1</span> of <span id="wiz-step-total">1</span></div>
+            <div class="wizard-progress-bar"><div class="wizard-progress-fill" id="wiz-progress-fill" style="width:0%"></div></div>
+          </div>
           <form id="orderForm" novalidate>
 
-            <!-- 1. System -->
-            <div class="form-row">
-              <label class="form-label" for="system">System</label>
-              <select class="form-input" id="system" name="system" required>
-                <option value="" disabled selected>Select your system…</option>
-                <option value="ps5-controller">PS5 Controller</option>
-                <option value="xbox">Xbox Controller</option>
-                <option value="switch">Nintendo Switch Joy-Cons</option>
-                <option value="ps5-console">PS5 Console</option>
-              </select>
-            </div>
-
-            <!-- Customization block — revealed when system is selected -->
-            <div id="customization-block" style="display:none; opacity:0;">
-
-              <!-- 2. Parts -->
+            <!-- Step 0: System -->
+            <div class="wizard-step active" id="ws-system">
               <div class="form-row">
-                <label class="form-label">Parts to Customize</label>
-                <div class="parts-grid" id="parts-grid"></div>
-                <p class="field-error" id="parts-error" style="display:none">Select at least one part to continue.</p>
+                <label class="form-label" for="system">System</label>
+                <select class="form-input" id="system" name="system">
+                  <option value="" disabled selected>Select your system…</option>
+                  <option value="ps5-controller">PS5 Controller</option>
+                  <option value="xbox">Xbox Controller</option>
+                  <option value="switch-left">Nintendo Switch — Joy-Con Left</option>
+                  <option value="switch-right">Nintendo Switch — Joy-Con Right</option>
+                  <option value="ps5-console">PS5 Console</option>
+                </select>
+                <p class="field-error" id="sys-error" style="display:none">Please select a system.</p>
               </div>
-
-              <!-- 3. Hydro Dip Toggle -->
-              <div class="form-row" id="hydro-row">
-                <label class="form-label">Hydro Dip?</label>
-                <div class="hydro-note">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  Hydro dipping applies to Top Shell and Touchpad (PS5) only
-                </div>
-                <div class="toggle-group">
-                  <div class="toggle-opt">
-                    <input type="radio" name="hydrodip" value="yes" id="hydro-yes">
-                    <label for="hydro-yes">Yes</label>
-                  </div>
-                  <div class="toggle-opt">
-                    <input type="radio" name="hydrodip" value="no" id="hydro-no" checked>
-                    <label for="hydro-no">No</label>
-                  </div>
-                </div>
+              <div class="wizard-nav">
+                <button type="button" class="btn-wiz-next" onclick="wizNext()">Next →</button>
               </div>
+            </div>
 
-              <!-- Touchpad auto-link notice (PS5 only, shown when Hydro Dip + Top Shell) -->
-              <div class="form-row" id="touchpad-link-notice" style="display:none">
-                <div class="hydro-note" style="border-color:rgba(0,229,255,0.38)">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                  Touchpad will be hydro dipped in the same colors as the Top Shell — no separate color selection needed.
-                </div>
-              </div>
+            <!-- Part steps injected here by JS -->
+            <div id="part-steps-wrap"></div>
 
-              <!-- 4. Finish -->
+            <!-- Final Step: Contact Info -->
+            <div class="wizard-step" id="ws-contact">
+              <div class="step-part-title">Your Info</div>
+              <div class="step-separator"></div>
               <div class="form-row">
-                <label class="form-label">Finish</label>
-                <div class="toggle-group">
-                  <div class="toggle-opt" id="matte-finish-opt">
-                    <input type="radio" name="finish" value="matte" id="finish-matte">
-                    <label for="finish-matte">Matte</label>
-                  </div>
-                  <div class="toggle-opt">
-                    <input type="radio" name="finish" value="gloss" id="finish-gloss">
-                    <label for="finish-gloss">Gloss</label>
-                  </div>
-                </div>
-                <p class="field-error" id="finish-error" style="display:none">Please select a finish type.</p>
+                <label class="form-label" for="name">Your Name</label>
+                <input type="text" class="form-input" id="name" name="name" placeholder="First name is fine">
+                <p class="field-error" id="name-error" style="display:none">Name is required.</p>
               </div>
-
-              <!-- 5. Color Selection -->
               <div class="form-row">
-                <label class="form-label" style="margin-bottom:16px">Color</label>
-
-                <!-- Matte Colors -->
-                <div id="matte-colors-block">
-                  <p class="color-section-label">Matte Colors</p>
-                  <div class="color-grid" id="matte-color-grid"></div>
-                </div>
-
-                <div class="color-divider" id="color-divider"></div>
-
-                <!-- Gloss Colors -->
-                <div id="gloss-colors-block">
-                  <p class="color-section-label">Gloss Colors</p>
-                  <div class="color-grid" id="gloss-color-grid"></div>
-                </div>
-
-                <p class="field-error" id="color-error" style="display:none">Please select a color.</p>
+                <label class="form-label" for="contact">Instagram Handle or Phone Number</label>
+                <input type="text" class="form-input" id="contact" name="contact" placeholder="@yourhandle  or  (555) 000-0000">
+                <p class="field-error" id="contact-error" style="display:none">Contact info is required.</p>
               </div>
-
-            </div>
-            <!-- end customization-block -->
-
-            <!-- 6. Name -->
-            <div class="form-row">
-              <label class="form-label" for="name">Your Name</label>
-              <input type="text" class="form-input" id="name" name="name" placeholder="First name is fine" required>
-            </div>
-
-            <!-- 7. Contact -->
-            <div class="form-row">
-              <label class="form-label" for="contact">Instagram Handle or Phone Number</label>
-              <input type="text" class="form-input" id="contact" name="contact" placeholder="@yourhandle  or  (555) 000-0000" required>
+              <div class="form-row" style="margin-bottom:36px">
+                <label class="form-label" for="notes">Additional Notes</label>
+                <textarea class="form-input" id="notes" name="notes" rows="4" style="resize:vertical" placeholder="Reference images, inspo, specific details…"></textarea>
+              </div>
+              <div class="wizard-nav">
+                <button type="button" class="btn-wiz-back" onclick="wizBack()">← Back</button>
+                <button type="submit" class="btn-submit" id="submitBtn">Submit Order Request</button>
+              </div>
             </div>
 
-            <!-- 8. Notes -->
-            <div class="form-row" style="margin-bottom: 36px;">
-              <label class="form-label" for="notes">Additional Notes</label>
-              <textarea class="form-input" id="notes" name="notes" rows="4" style="resize: vertical;" placeholder="Reference images, inspo, specific details…"></textarea>
-            </div>
-
-            <button type="submit" class="btn-submit" id="submitBtn">Submit Order Request</button>
-
-            <div class="form-success" id="formSuccess">
+            <div class="form-success" id="formSuccess" style="display:none">
               ✓ &nbsp;Order request sent! We'll reach out soon.
             </div>
 
@@ -1238,10 +1275,10 @@
 
 
   <script>
-    /* ── PARTS BY SYSTEM ─────────────────────────────────────── */
+    /* ── PARTS BY SYSTEM ──────────────────────────────────── */
     const PARTS_BY_SYSTEM = {
       'ps5-controller': [
-        { value: 'top-shell',  label: 'Top Shell',       hydroEligible: true },
+        { value: 'top-shell',  label: 'Top Shell',  hydroEligible: true },
         { value: 'back-plate', label: 'Back Plate' },
         { value: 'buttons',    label: 'Buttons' },
         { value: 'd-pad',      label: 'D-Pad' },
@@ -1249,7 +1286,7 @@
         { value: 'l2',         label: 'L2' },
         { value: 'r1',         label: 'R1' },
         { value: 'r2',         label: 'R2' },
-        { value: 'touchpad',   label: 'Touchpad',        hydroLinked: true },
+        { value: 'touchpad',   label: 'Touchpad',   hydroLinked: true },
       ],
       'xbox': [
         { value: 'top-shell',       label: 'Top Shell',       hydroEligible: true },
@@ -1262,14 +1299,20 @@
         { value: 'rb',              label: 'RB' },
         { value: 'trigger-buttons', label: 'Trigger Buttons' },
       ],
-      'switch': [
+      'switch-left': [
         { value: 'top-shell',       label: 'Top Shell',       hydroEligible: true },
         { value: 'back-plate',      label: 'Back Plate' },
         { value: 'buttons',         label: 'Buttons' },
         { value: 'd-pad',           label: 'D-Pad' },
         { value: 'zl',              label: 'ZL' },
-        { value: 'zr',              label: 'ZR' },
         { value: 'l',               label: 'L' },
+        { value: 'trigger-buttons', label: 'Trigger Buttons' },
+      ],
+      'switch-right': [
+        { value: 'top-shell',       label: 'Top Shell',       hydroEligible: true },
+        { value: 'back-plate',      label: 'Back Plate' },
+        { value: 'buttons',         label: 'Buttons' },
+        { value: 'zr',              label: 'ZR' },
         { value: 'r',               label: 'R' },
         { value: 'trigger-buttons', label: 'Trigger Buttons' },
       ],
@@ -1278,11 +1321,10 @@
       ],
     };
 
-    /* ── COLOR CATALOG ───────────────────────────────────────────
-       To add a new color: push a new entry to MATTE_COLORS or
-       GLOSS_COLORS. Set img to a file path when the spray can
-       image is ready; while img is null a colored placeholder shows.
-    ─────────────────────────────────────────────────────────── */
+    /* ── COLOR CATALOG ────────────────────────────────────────
+       Add new colors by pushing entries here.
+       Set img to a file path when spray can image is ready.
+    ──────────────────────────────────────────────────────── */
     const MATTE_COLORS = [
       { id: 'matte-black', name: 'Matte Black', img: null, hex: '1a1a1a' },
       { id: 'matte-white', name: 'Matte White', img: null, hex: 'd0d0d0' },
@@ -1293,149 +1335,282 @@
     ];
 
     const GLOSS_COLORS = [
-      { id: 'gloss-black',  name: 'Gloss Black',  img: null, hex: '0d0d0d' },
-      { id: 'gloss-white',  name: 'Gloss White',  img: null, hex: 'f0f0f0' },
+      { id: 'gloss-black',      name: 'Gloss Black',      img: null,                           hex: '0d0d0d' },
+      { id: 'gloss-white',      name: 'Gloss White',      img: null,                           hex: 'f0f0f0' },
       { id: 'gloss-red-pepper', name: 'Gloss Red Pepper', img: 'Brand%20Images/Red%20Can.png', hex: 'cc0000' },
-      { id: 'gloss-blue',   name: 'Gloss Blue',   img: null, hex: '0044cc' },
-      { id: 'gloss-gold',   name: 'Gloss Gold',   img: null, hex: 'b8860b' },
-      { id: 'gloss-silver', name: 'Gloss Silver', img: null, hex: '9a9a9a' },
+      { id: 'gloss-blue',       name: 'Gloss Blue',       img: null,                           hex: '0044cc' },
+      { id: 'gloss-gold',       name: 'Gloss Gold',       img: null,                           hex: 'b8860b' },
+      { id: 'gloss-silver',     name: 'Gloss Silver',     img: null,                           hex: '9a9a9a' },
     ];
 
-    /* ── HELPERS ─────────────────────────────────────────────── */
-    function buildColorGrid(colors, finish) {
+    /* ── WIZARD STATE ─────────────────────────────────────── */
+    let wizStep  = 0;    // 0=system, 1..N=parts, N+1=contact
+    let partSteps = []; // part configs (excludes hydroLinked parts)
+    let currentSys = '';
+
+    /* ── COLOR GRID BUILDER ───────────────────────────────── */
+    function colorSrc(c) {
+      return c.img || `https://placehold.co/56x84/${c.hex}/ffffff?text=+`;
+    }
+
+    function buildColorGrid(pv, finish, isMulti) {
+      const colors = finish === 'matte' ? MATTE_COLORS : GLOSS_COLORS;
+      const name   = `color_${pv}`;
       return colors.map(c => {
-        const src = c.img
-          ? c.img
-          : `https://placehold.co/56x84/${c.hex}/ffffff?text=+`;
-        return `
-          <label class="color-opt">
-            <input type="radio" name="color" value="${c.id}" data-finish="${finish}">
-            <span class="color-opt-inner">
-              <span class="color-img-wrap"><img src="${src}" alt="${c.name}"></span>
-              <span class="color-name">${c.name}</span>
-            </span>
-          </label>`;
+        const type = isMulti ? 'checkbox' : 'radio';
+        const cls  = isMulti ? 'color-opt color-opt-check' : 'color-opt';
+        return `<label class="${cls}">
+          <input type="${type}" name="${name}" value="${c.id}">
+          <span class="color-opt-inner">
+            <span class="color-img-wrap"><img src="${colorSrc(c)}" alt="${c.name}"></span>
+            <span class="color-name">${c.name}</span>
+          </span>
+        </label>`;
       }).join('');
     }
 
-    function buildPartsGrid(system) {
-      const parts = PARTS_BY_SYSTEM[system] || [];
-      return parts.map(p => `
-        <label class="check-item" data-part="${p.value}"${p.hydroLinked ? ' data-hydro-linked="true"' : ''}>
-          <input type="checkbox" name="parts" value="${p.value}"${p.hydroLinked ? ' id="touchpad-check"' : ''}>
-          <span class="check-box"></span>
-          <span class="check-label">${p.label}</span>
-        </label>`
-      ).join('');
-    }
-
-    /* ── DOM REFS ────────────────────────────────────────────── */
-    const systemEl        = document.getElementById('system');
-    const custBlock       = document.getElementById('customization-block');
-    const partsGrid       = document.getElementById('parts-grid');
-    const partsError      = document.getElementById('parts-error');
-    const hydroRow        = document.getElementById('hydro-row');
-    const hydroYes        = document.getElementById('hydro-yes');
-    const hydroNo         = document.getElementById('hydro-no');
-    const touchNotice     = document.getElementById('touchpad-link-notice');
-    const matteFinishOpt  = document.getElementById('matte-finish-opt');
-    const finishGloss     = document.getElementById('finish-gloss');
-    const finishMatte     = document.getElementById('finish-matte');
-    const finishError     = document.getElementById('finish-error');
-    const matteColorsBlock = document.getElementById('matte-colors-block');
-    const colorDivider    = document.getElementById('color-divider');
-    const colorError      = document.getElementById('color-error');
-
-    /* ── INIT color grids (rendered once) ───────────────────── */
-    document.getElementById('matte-color-grid').innerHTML = buildColorGrid(MATTE_COLORS, 'matte');
-    document.getElementById('gloss-color-grid').innerHTML = buildColorGrid(GLOSS_COLORS, 'gloss');
-
-    /* ── SYSTEM CHANGE ───────────────────────────────────────── */
-    systemEl.addEventListener('change', () => {
-      const sys = systemEl.value;
-
-      partsGrid.innerHTML = buildPartsGrid(sys);
-      partsGrid.querySelectorAll('input[type="checkbox"]').forEach(cb =>
-        cb.addEventListener('change', onPartsChange)
-      );
-
-      // Reset hydro to No
-      hydroNo.checked = true;
-
-      // Hydro row only relevant when system has a Top Shell (not PS5 Console)
-      hydroRow.style.display = (sys === 'ps5-console') ? 'none' : '';
-
-      // Show the customization block
-      custBlock.style.display = 'block';
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        custBlock.style.opacity = '1';
-      }));
-
-      updateHydroState();
-    });
-
-    /* ── HYDRO DIP CHANGE ────────────────────────────────────── */
-    [hydroYes, hydroNo].forEach(r => r.addEventListener('change', updateHydroState));
-
-    function updateHydroState() {
-      const isHydro = hydroYes.checked;
-
-      // Disable Matte finish option
-      matteFinishOpt.classList.toggle('disabled', isHydro);
-      finishMatte.disabled = isHydro;
-      if (isHydro) {
-        finishGloss.checked = true;
-        finishMatte.checked = false;
-        // Deselect any matte color
-        document.querySelectorAll('input[name="color"][data-finish="matte"]')
-          .forEach(r => r.checked = false);
-      }
-
-      // Show/hide Matte colors section
-      matteColorsBlock.style.display = isHydro ? 'none' : '';
-      colorDivider.style.display     = isHydro ? 'none' : '';
-
-      updateTouchpadLink();
-    }
-
-    /* ── PARTS CHANGE ────────────────────────────────────────── */
-    function onPartsChange() {
-      updateTouchpadLink();
-    }
-
-    function updateTouchpadLink() {
-      const isHydro      = hydroYes.checked;
-      const topShellCb   = partsGrid.querySelector('input[value="top-shell"]');
-      const touchpadItem = partsGrid.querySelector('[data-part="touchpad"]');
-      const touchpadCb   = document.getElementById('touchpad-check');
-
-      if (!touchpadItem || !touchpadCb || !topShellCb) {
-        touchNotice.style.display = 'none';
+    function setColorGrid(pv, finish, isMulti) {
+      const grid = document.getElementById(`cgrid-${pv}`);
+      if (!grid) return;
+      if (!finish) {
+        grid.innerHTML = `<p class="color-grid-placeholder">Select a finish above to see available colors.</p>`;
         return;
       }
-
-      const shouldLink = isHydro && topShellCb.checked;
-
-      if (shouldLink) {
-        touchpadCb.checked  = true;
-        touchpadCb.disabled = true;
-        touchpadItem.classList.add('linked');
-        touchNotice.style.display = 'block';
-      } else {
-        touchpadCb.disabled = false;
-        touchpadItem.classList.remove('linked');
-        touchNotice.style.display = 'none';
+      grid.innerHTML = buildColorGrid(pv, finish, isMulti);
+      if (isMulti) {
+        grid.querySelectorAll('input[type="checkbox"]').forEach(cb =>
+          cb.addEventListener('change', () => enforceHydroLimit(pv))
+        );
       }
     }
 
-    /* ── NAV ─────────────────────────────────────────────────── */
+    function enforceHydroLimit(pv) {
+      const grid    = document.getElementById(`cgrid-${pv}`);
+      const checked = [...grid.querySelectorAll('input:checked')];
+      const count   = checked.length;
+      const countEl = document.getElementById(`hcount-${pv}`);
+      if (countEl) countEl.textContent = count;
+      grid.querySelectorAll('label').forEach(label => {
+        const inp = label.querySelector('input');
+        const over = count >= 3 && !inp.checked;
+        label.classList.toggle('maxed', over);
+        inp.disabled = over;
+      });
+    }
+
+    /* ── RENDER PART STEP ─────────────────────────────────── */
+    function renderPartStep(part, idx, sys) {
+      const pv          = part.value;
+      const isTopShell  = pv === 'top-shell';
+      const canHydro    = !!part.hydroEligible && sys !== 'ps5-console';
+      const hasTouchpad = sys === 'ps5-controller' && isTopShell;
+      const canSkip     = !isTopShell && pv !== 'panels';
+
+      let h = `<div class="wizard-step" id="ws-part-${idx}">`;
+      h += `<div class="step-part-title">${part.label}</div><div class="step-separator"></div>`;
+
+      if (canSkip) {
+        h += `<div class="skip-wrap">
+          <button type="button" class="skip-btn" id="skip-${pv}" onclick="toggleSkip('${pv}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            No Color — Skip This Part
+          </button>
+        </div>`;
+      }
+
+      h += `<div class="part-options-wrap" id="opts-${pv}">`;
+
+      if (canHydro) {
+        h += `<div class="form-row">
+          <label class="form-label">Hydro Dip?</label>
+          <div class="hydro-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Hydro dipping applies to Top Shell${hasTouchpad ? ' and Touchpad (PS5)' : ''} only
+          </div>
+          <div class="toggle-group">
+            <div class="toggle-opt"><input type="radio" name="hydro_${pv}" value="yes" id="hyes-${pv}" onchange="onHydroChange('${pv}')"><label for="hyes-${pv}">Yes</label></div>
+            <div class="toggle-opt"><input type="radio" name="hydro_${pv}" value="no"  id="hno-${pv}"  checked onchange="onHydroChange('${pv}')"><label for="hno-${pv}">No</label></div>
+          </div>
+        </div>`;
+        if (hasTouchpad) {
+          h += `<div id="tpad-notice-${pv}" style="display:none" class="form-row">
+            <div class="hydro-note" style="border-color:rgba(0,229,255,0.38)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Touchpad will be hydro dipped in the same colors as the Top Shell.
+            </div>
+          </div>`;
+        }
+      }
+
+      h += `<div class="form-row">
+        <label class="form-label">Finish</label>
+        <div class="toggle-group">
+          <div class="toggle-opt" id="mopt-${pv}">
+            <input type="radio" name="finish_${pv}" value="matte" id="fmatte-${pv}" onchange="onFinishChange('${pv}')">
+            <label for="fmatte-${pv}">Matte</label>
+          </div>
+          <div class="toggle-opt">
+            <input type="radio" name="finish_${pv}" value="gloss" id="fgloss-${pv}" onchange="onFinishChange('${pv}')">
+            <label for="fgloss-${pv}">Gloss</label>
+          </div>
+        </div>
+        <p class="field-error" id="ferr-${pv}" style="display:none">Please select a finish.</p>
+      </div>`;
+
+      h += `<div class="form-row">
+        <label class="form-label" style="margin-bottom:10px">Color</label>
+        <div id="hhint-${pv}" class="hydro-color-hint" style="display:none">
+          2–3 colors required for hydro dip &nbsp;(<span id="hcount-${pv}">0</span>/3 selected)
+        </div>
+        <div class="color-grid" id="cgrid-${pv}">
+          <p class="color-grid-placeholder">Select a finish above to see available colors.</p>
+        </div>
+        <p class="field-error" id="cerr-${pv}" style="display:none">Please select a color.</p>
+      </div>`;
+
+      h += `</div>`; // opts-wrap
+
+      const isFirst = idx === 0;
+      h += `<div class="wizard-nav">
+        <button type="button" class="btn-wiz-back" onclick="wizBack()">← Back</button>
+        <button type="button" class="btn-wiz-next" onclick="wizNextPart(${idx})">${idx === partSteps.length - 1 ? 'Done →' : 'Next →'}</button>
+      </div>`;
+
+      h += `</div>`;
+      return h;
+    }
+
+    /* ── EVENT HANDLERS ───────────────────────────────────── */
+    function toggleSkip(pv) {
+      const btn  = document.getElementById(`skip-${pv}`);
+      const opts = document.getElementById(`opts-${pv}`);
+      const on   = btn.classList.toggle('active');
+      opts.classList.toggle('dimmed', on);
+    }
+
+    function onHydroChange(pv) {
+      const isHydro   = document.getElementById(`hyes-${pv}`)?.checked;
+      const matteOpt  = document.getElementById(`mopt-${pv}`);
+      const matteInp  = document.getElementById(`fmatte-${pv}`);
+      const glossInp  = document.getElementById(`fgloss-${pv}`);
+      const tNotice   = document.getElementById(`tpad-notice-${pv}`);
+      const hint      = document.getElementById(`hhint-${pv}`);
+
+      if (matteOpt) matteOpt.classList.toggle('disabled', isHydro);
+      if (matteInp) matteInp.disabled = isHydro;
+      if (isHydro && glossInp) { glossInp.checked = true; matteInp.checked = false; }
+      if (tNotice) tNotice.style.display = isHydro ? 'block' : 'none';
+      if (hint)    hint.style.display    = isHydro ? 'block' : 'none';
+
+      const finish = glossInp?.checked ? 'gloss' : (matteInp?.checked ? 'matte' : null);
+      if (finish) setColorGrid(pv, finish, isHydro);
+    }
+
+    function onFinishChange(pv) {
+      const isHydro = document.getElementById(`hyes-${pv}`)?.checked;
+      const finish  = document.getElementById(`fgloss-${pv}`)?.checked ? 'gloss'
+                    : document.getElementById(`fmatte-${pv}`)?.checked ? 'matte' : null;
+      setColorGrid(pv, finish, isHydro || false);
+      document.getElementById(`ferr-${pv}`).style.display = 'none';
+    }
+
+    /* ── PROGRESS ─────────────────────────────────────────── */
+    function updateProgress() {
+      const total = partSteps.length + 2;
+      document.getElementById('wiz-step-num').textContent   = wizStep + 1;
+      document.getElementById('wiz-step-total').textContent = total;
+      const pct = Math.round((wizStep / (total - 1)) * 100);
+      document.getElementById('wiz-progress-fill').style.width = pct + '%';
+    }
+
+    function showStep(n) {
+      document.getElementById('ws-system').classList.remove('active');
+      document.getElementById('ws-contact').classList.remove('active');
+      partSteps.forEach((_, i) => document.getElementById(`ws-part-${i}`)?.classList.remove('active'));
+
+      if (n === 0) {
+        document.getElementById('ws-system').classList.add('active');
+      } else if (n <= partSteps.length) {
+        document.getElementById(`ws-part-${n - 1}`)?.classList.add('active');
+      } else {
+        document.getElementById('ws-contact').classList.add('active');
+      }
+      wizStep = n;
+      updateProgress();
+      document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* ── NAVIGATION ───────────────────────────────────────── */
+    function wizNext() {
+      const sys = document.getElementById('system').value;
+      if (!sys) {
+        document.getElementById('sys-error').style.display = 'block';
+        document.getElementById('system').style.borderColor = '#ff4560';
+        return;
+      }
+      document.getElementById('sys-error').style.display = 'none';
+      document.getElementById('system').style.borderColor = '';
+
+      currentSys = sys;
+      const allParts = PARTS_BY_SYSTEM[sys] || [];
+      partSteps = allParts.filter(p => !p.hydroLinked);
+
+      const wrap = document.getElementById('part-steps-wrap');
+      wrap.innerHTML = partSteps.map((p, i) => renderPartStep(p, i, sys)).join('');
+
+      document.getElementById('wizard-progress').style.display = 'block';
+      showStep(1);
+    }
+
+    function wizBack() {
+      if (wizStep > 0) showStep(wizStep - 1);
+    }
+
+    function wizNextPart(idx) {
+      const part = partSteps[idx];
+      const pv   = part.value;
+      const skipBtn  = document.getElementById(`skip-${pv}`);
+      const isSkipped = skipBtn?.classList.contains('active');
+
+      if (!isSkipped) {
+        const matteInp = document.getElementById(`fmatte-${pv}`);
+        const glossInp = document.getElementById(`fgloss-${pv}`);
+        if (!matteInp?.checked && !glossInp?.checked) {
+          document.getElementById(`ferr-${pv}`).style.display = 'block';
+          return;
+        }
+        document.getElementById(`ferr-${pv}`).style.display = 'none';
+
+        const isHydro  = document.getElementById(`hyes-${pv}`)?.checked;
+        const selected = [...document.querySelectorAll(`input[name="color_${pv}"]:checked`)];
+        const errEl    = document.getElementById(`cerr-${pv}`);
+
+        if (isHydro && selected.length < 2) {
+          errEl.textContent = selected.length === 0
+            ? 'Select 2–3 colors for hydro dip.'
+            : 'Select at least one more color (2 minimum for hydro dip).';
+          errEl.style.display = 'block';
+          return;
+        }
+        if (!isHydro && selected.length === 0) {
+          errEl.textContent = 'Please select a color.';
+          errEl.style.display = 'block';
+          return;
+        }
+        errEl.style.display = 'none';
+      }
+
+      showStep(idx + 2 <= partSteps.length ? idx + 2 : partSteps.length + 1);
+    }
+
+    /* ── NAV ──────────────────────────────────────────────── */
     const mq = window.matchMedia('(min-width: 768px)');
     const navLinks = document.getElementById('nav-links');
     const updateNav = () => { navLinks.style.display = mq.matches ? 'flex' : 'none'; };
     mq.addEventListener('change', updateNav);
     updateNav();
 
-    /* ── SCROLL REVEAL ───────────────────────────────────────── */
+    /* ── SCROLL REVEAL ────────────────────────────────────── */
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
@@ -1444,52 +1619,21 @@
     document.querySelectorAll('.reveal, .stagger').forEach(el => io.observe(el));
     setTimeout(() => document.getElementById('hero-copy')?.classList.add('in'), 120);
 
-    /* ── FORM SUBMIT ─────────────────────────────────────────── */
+    /* ── FORM SUBMIT ──────────────────────────────────────── */
     document.getElementById('orderForm').addEventListener('submit', function(e) {
       e.preventDefault();
       let valid = true;
 
-      // System
-      if (!systemEl.value) {
-        systemEl.style.borderColor = '#ff4560';
-        systemEl.addEventListener('change', () => systemEl.style.borderColor = '', { once: true });
-        valid = false;
-      }
-
-      // Customization fields (only when block is visible)
-      if (custBlock.style.display !== 'none') {
-        const checkedParts = partsGrid.querySelectorAll('input[type="checkbox"]:checked');
-        if (checkedParts.length === 0) {
-          partsError.style.display = 'block';
-          valid = false;
-        } else {
-          partsError.style.display = 'none';
-        }
-
-        const finishVal = document.querySelector('input[name="finish"]:checked');
-        if (!finishVal) {
-          finishError.style.display = 'block';
-          valid = false;
-        } else {
-          finishError.style.display = 'none';
-        }
-
-        const colorVal = document.querySelector('input[name="color"]:checked');
-        if (!colorVal) {
-          colorError.style.display = 'block';
-          valid = false;
-        } else {
-          colorError.style.display = 'none';
-        }
-      }
-
-      // Name & Contact
       ['name', 'contact'].forEach(id => {
-        const el = document.getElementById(id);
+        const el  = document.getElementById(id);
+        const err = document.getElementById(id + '-error');
         if (!el.value.trim()) {
+          err.style.display = 'block';
           el.style.borderColor = '#ff4560';
-          el.addEventListener('input', () => el.style.borderColor = '', { once: true });
+          el.addEventListener('input', () => { err.style.display = 'none'; el.style.borderColor = ''; }, { once: true });
           valid = false;
+        } else {
+          err.style.display = 'none';
         }
       });
 
@@ -1504,8 +1648,11 @@
         success.style.display = 'block';
         btn.textContent = 'Submitted!';
         this.reset();
-        custBlock.style.opacity = '0';
-        custBlock.style.display = 'none';
+        document.getElementById('part-steps-wrap').innerHTML = '';
+        document.getElementById('wizard-progress').style.display = 'none';
+        partSteps = [];
+        wizStep   = 0;
+        showStep(0);
         success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }, 900);
     });
