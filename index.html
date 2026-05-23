@@ -1185,7 +1185,7 @@
             <div class="wizard-step-counter">Step <span id="wiz-step-num">1</span> of <span id="wiz-step-total">1</span></div>
             <div class="wizard-progress-bar"><div class="wizard-progress-fill" id="wiz-progress-fill" style="width:0%"></div></div>
           </div>
-          <form id="orderForm" novalidate>
+          <form id="orderForm" action="https://formspree.io/f/mbdbkpva" method="POST" novalidate>
 
             <!-- Step 0: System -->
             <div class="wizard-step active" id="ws-system">
@@ -1649,17 +1649,33 @@
       btn.textContent = 'Sending…';
       btn.disabled    = true;
 
-      setTimeout(() => {
-        success.style.display = 'block';
-        btn.textContent = 'Submitted!';
-        this.reset();
-        document.getElementById('part-steps-wrap').innerHTML = '';
-        document.getElementById('wizard-progress').style.display = 'none';
-        partSteps = [];
-        wizStep   = 0;
-        showStep(0);
-        success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 900);
+      fetch('https://formspree.io/f/mbdbkpva', {
+        method: 'POST',
+        body: new FormData(this),
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(res => {
+        if (res.ok) {
+          success.style.display = 'block';
+          btn.textContent = 'Submitted!';
+          this.reset();
+          document.getElementById('part-steps-wrap').innerHTML = '';
+          document.getElementById('wizard-progress').style.display = 'none';
+          partSteps = [];
+          wizStep   = 0;
+          showStep(0);
+          success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          btn.textContent = 'Submit Order Request';
+          btn.disabled = false;
+          alert('Something went wrong. Please try again.');
+        }
+      })
+      .catch(() => {
+        btn.textContent = 'Submit Order Request';
+        btn.disabled = false;
+        alert('Something went wrong. Please try again.');
+      });
     });
   </script>
 
