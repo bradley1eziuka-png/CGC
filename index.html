@@ -996,7 +996,7 @@
       <a href="#how-it-works" class="nav-link">How It Works</a>
       <a href="#order"        class="nav-link">Order</a>
     </div>
-    <a href="#order" class="btn-outline">Start Your Order</a>
+    <a href="#order" class="btn-outline">Build Yours</a>
   </nav>
 
 
@@ -1015,16 +1015,15 @@
         >
         <div class="hero-tag">Custom Gaming Consoles</div>
         <h1 class="hero-headline">
-          Custom<br>
-          <span class="glow">Controllers.</span><br>
-          Built Your Way.
+          No Two<br>
+          <span class="glow">Look Alike.</span><br>
+          Yours Won't Either.
         </h1>
         <p class="hero-desc">
-          PS5. Xbox. Nintendo Switch. Every build is made to order: spray paint, hydro dip, or
-          a mix of both. Your vision, built from scratch.
+          PS5. Xbox. Nintendo Switch. Every controller is handmade to your exact specs — spray paint, hydro dip, or a mix of both. Nothing off a shelf. Nothing like anyone else's.
         </p>
         <a href="#order" class="btn-cta">
-          Start Your Order
+          Start My Build
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
@@ -1050,7 +1049,7 @@
     <div class="section-wrap">
       <div class="gallery-header reveal">
         <p class="section-eyebrow">The Work</p>
-        <h2 class="section-title">Gallery</h2>
+        <h2 class="section-title">Every Build, One of a Kind</h2>
       </div>
     </div>
 
@@ -1131,34 +1130,32 @@
     <div class="section-wrap">
       <div class="reveal">
         <p class="section-eyebrow">The Process</p>
-        <h2 class="section-title">How It Works</h2>
+        <h2 class="section-title">Three Steps. Fully Custom.</h2>
       </div>
 
       <div class="steps-grid stagger">
 
         <div class="step-card">
           <div class="step-num">01</div>
-          <h3>Choose Your System</h3>
+          <h3>Pick Your Platform</h3>
           <p>
-            PS5 controller, Xbox controller, Nintendo Switch Joy-Cons, or a full PS5 console. Pick what you want customized and we'll take it from there.
+            PS5 controller, Xbox controller, Nintendo Switch Joy-Cons, or a full PS5 console. Tell us what you're working with.
           </p>
         </div>
 
         <div class="step-card">
           <div class="step-num">02</div>
-          <h3>Pick Your Style</h3>
+          <h3>Choose Your Finish</h3>
           <p>
-            Solid spray paint, hydro dip, or a mix of both. Choose your colors, patterns,
-            and which parts get the treatment.
+            Spray paint, hydro dip, or combine both. Choose your colors and which parts get the treatment — right down to the buttons.
           </p>
         </div>
 
         <div class="step-card">
           <div class="step-num">03</div>
-          <h3>Submit &amp; We Build It</h3>
+          <h3>We Build It</h3>
           <p>
-            Fill out the order form below. We'll reach out to confirm your details,
-            quote your build, and get it done.
+            Fill out the form. We confirm your specs, send a quote, and get to work. You'll receive something nobody else has.
           </p>
         </div>
 
@@ -1174,9 +1171,9 @@
 
         <div class="reveal">
           <p class="section-eyebrow">Get Started</p>
-          <h2 class="section-title">Start Your Order</h2>
+          <h2 class="section-title">Design Your Custom Build</h2>
           <p style="color: var(--muted); font-size: 1rem; line-height: 1.75; margin-top: 14px;">
-            Fill out the form and we'll reach out to confirm your build, pricing, and timeline.
+            Tell us your platform, your style, and your colors. We'll get back to you with pricing and next steps.
           </p>
         </div>
 
@@ -1235,12 +1232,12 @@
               </div>
               <div class="wizard-nav">
                 <button type="button" class="btn-wiz-back" onclick="wizBack()">← Back</button>
-                <button type="submit" class="btn-submit" id="submitBtn">Submit Order Request</button>
+                <button type="submit" class="btn-submit" id="submitBtn">Send My Order</button>
               </div>
             </div>
 
             <div class="form-success" id="formSuccess" style="display:none">
-              ✓ &nbsp;Order request sent! We'll reach out soon.
+              ✓ &nbsp;Order received. We'll be in touch shortly with your quote.
             </div>
 
           </form>
@@ -1667,13 +1664,13 @@
           showStep(0);
           success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
-          btn.textContent = 'Submit Order Request';
+          btn.textContent = 'Send My Order';
           btn.disabled = false;
           alert('Something went wrong. Please try again.');
         }
       })
       .catch(() => {
-        btn.textContent = 'Submit Order Request';
+        btn.textContent = 'Send My Order';
         btn.disabled = false;
         alert('Something went wrong. Please try again.');
       });
